@@ -68,7 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+//import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -202,7 +202,7 @@ public final class YoutubeParsingHelper {
 
     private static boolean keyAndVersionExtracted = false;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private static Optional<Boolean> hardcodedClientVersionAndKeyValid = Optional.empty();
+    private static Boolean hardcodedClientVersionAndKeyValid = null;
 
     private static final String[] INNERTUBE_CONTEXT_CLIENT_VERSION_REGEXES =
             {"INNERTUBE_CONTEXT_CLIENT_VERSION\":\"([0-9\\.]+?)\"",
@@ -578,8 +578,8 @@ public final class YoutubeParsingHelper {
 
     public static boolean areHardcodedClientVersionAndKeyValid()
             throws IOException, ExtractionException {
-        if (hardcodedClientVersionAndKeyValid.isPresent()) {
-            return hardcodedClientVersionAndKeyValid.get();
+        if (hardcodedClientVersionAndKeyValid != null) {
+            return hardcodedClientVersionAndKeyValid;
         }
         // @formatter:off
         final byte[] body = JsonWriter.string()
@@ -611,9 +611,9 @@ public final class YoutubeParsingHelper {
         final String responseBody = response.responseBody();
         final int responseCode = response.responseCode();
 
-        hardcodedClientVersionAndKeyValid = Optional.of(responseBody.length() > 5000
+        hardcodedClientVersionAndKeyValid = (responseBody.length() > 5000
                 && responseCode == 200); // Ensure to have a valid response
-        return hardcodedClientVersionAndKeyValid.get();
+        return hardcodedClientVersionAndKeyValid;
     }
 
 

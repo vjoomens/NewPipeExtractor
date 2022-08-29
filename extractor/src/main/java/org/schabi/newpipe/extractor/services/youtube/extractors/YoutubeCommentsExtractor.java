@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ public class YoutubeCommentsExtractor extends CommentsExtractor {
      * is now called again, the method execution can avoid unnecessary calls
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Boolean> optCommentsDisabled = Optional.empty();
+    private Boolean optCommentsDisabled = null;
 
     public YoutubeCommentsExtractor(
             final StreamingService service,
@@ -57,14 +57,14 @@ public class YoutubeCommentsExtractor extends CommentsExtractor {
             throws IOException, ExtractionException {
 
         // Check if findInitialCommentsToken was already called and optCommentsDisabled initialized
-        if (optCommentsDisabled.orElse(false)) {
+        if (Boolean.TRUE.equals(optCommentsDisabled)) {
             return getInfoItemsPageForDisabledComments();
         }
 
         // Get the token
         final String commentsToken = findInitialCommentsToken();
         // Check if the comments have been disabled
-        if (optCommentsDisabled.get()) {
+        if (optCommentsDisabled) {
             return getInfoItemsPageForDisabledComments();
         }
 
@@ -112,7 +112,7 @@ public class YoutubeCommentsExtractor extends CommentsExtractor {
                 .orElse(null);
 
         // The comments are disabled if we couldn't get a token
-        optCommentsDisabled = Optional.of(token == null);
+        optCommentsDisabled = token == null;
 
         return token;
     }
@@ -173,7 +173,7 @@ public class YoutubeCommentsExtractor extends CommentsExtractor {
     @Override
     public InfoItemsPage<CommentsInfoItem> getPage(final Page page)
             throws IOException, ExtractionException {
-        if (optCommentsDisabled.orElse(false)) {
+        if (Boolean.TRUE.equals(optCommentsDisabled)) {
             return getInfoItemsPageForDisabledComments();
         }
         if (page == null || isNullOrEmpty(page.getId())) {
@@ -267,11 +267,11 @@ public class YoutubeCommentsExtractor extends CommentsExtractor {
     @Override
     public boolean isCommentsDisabled() throws ExtractionException {
         // Check if commentsDisabled has to be initialized
-        if (!optCommentsDisabled.isPresent()) {
+        if (optCommentsDisabled == null) {
             // Initialize commentsDisabled
             this.findInitialCommentsToken();
         }
 
-        return optCommentsDisabled.get();
+        return optCommentsDisabled;
     }
 }
